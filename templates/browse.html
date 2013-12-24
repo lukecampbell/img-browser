@@ -1,22 +1,36 @@
 {% extends "base.html" %}
 {% block head %}
-  <link rel="stylesheet" type="text/css" href="static/browse.css"></link>
+  <link rel="stylesheet" type="text/css" href="/static/browse.css"></link>
+  <script type="text/javascript">
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+    document.location = "/mobilebrowse/{{index}}";
+  }
+  </script>
 {% endblock %}
 {% block content %}
 
-  {% for r in jpg_rows %}
-    <div class="row">
+{% autoescape false %}
 
-      {% for imgitem in r %}
-        <div class="image">
-          <a href="{{imgitem}}">
-            <img src="thumb/{{imgitem}}"></img>
-          </a>
-        </div>
-      {% endfor %}
+  {{ html_content }}
 
+{% endautoescape %}
 
-    </div>
-  {% endfor %}
+<script type="text/javascript">
+$(function() {
+  document.onkeydown = handleKey;
+  function handleKey(evt) {
+    evt = evt || window.event;
+    switch (evt.keyCode) {
+      case 37:
+      window.location = "/browse/{{prev}}";
+      break;
+
+      case 39:
+      window.location = "/browse/{{next}}";
+      break;
+    }
+  };
+});
+</script>
 
 {% endblock %}

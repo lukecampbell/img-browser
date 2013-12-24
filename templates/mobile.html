@@ -1,0 +1,38 @@
+{% extends "mobilebase.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/css/mobileview.css"></link>
+{% endblock %}
+
+{% block content %}
+
+<div id="swipeBox" style="position:relative;width:100%;height:100%;">
+  <div class="image" data-id="{{index}}">
+    <a href="/view/{{next}}">
+      <img src="/{{imgitem}}"></img>
+    </a>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+  $(function() {
+    $('a').each(function() { 
+      $(this).attr("rel", "external");
+    });
+    $( "#swipeBox" ).on("swipeleft", lefthandler );
+    $( "#swipeBox" ).on("swiperight", righthandler);
+
+    function lefthandler(event) {
+      window.location = "/mobile/{{next}}";
+    }
+
+    function righthandler(event) {
+      window.location = "/mobile/{{prev}}";
+    }
+  });
+
+</script>
+
+{% endblock %}
+

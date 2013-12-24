@@ -1,0 +1,31 @@
+{% extends "mobilebase.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="/static/browse.css"></link>
+{% endblock %}
+{% block content %}
+
+
+{% autoescape false %}
+
+  {{ html_content }}
+
+{% endautoescape %}
+
+<script type="text/javascript">
+$(function() {
+    $('a').each(function() {
+      $(this).attr("rel", "external");
+    });
+    $( ".ui-page" ).on("swipeleft", lefthandler );
+    $( ".ui-page" ).on("swiperight", righthandler);
+    function lefthandler(event) {
+      window.location = "/mobilebrowse/{{next}}";
+    }
+    function righthandler(event) {
+      window.location = "/mobilebrowse/{{prev}}";
+    }
+});
+</script>
+
+{% endblock %}
+
