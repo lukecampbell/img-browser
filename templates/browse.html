@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block head %}
+  <link rel="stylesheet" type="text/css" href="static/browse.css"></link>
+{% endblock %}
+{% block content %}
+
+  {% for r in jpg_rows %}
+    <div class="row">
+
+      {% for imgitem in r %}
+        <div class="image">
+          <a href="{{imgitem}}">
+            <img src="thumb/{{imgitem}}"></img>
+          </a>
+        </div>
+      {% endfor %}
+
+
+    </div>
+  {% endfor %}
+
+{% endblock %}
