@@ -16,17 +16,25 @@
 {% endautoescape %}
 
 <script type="text/javascript">
+ var url = document.URL;
+ console.log(url);
+ var i = url.lastIndexOf('/');
+ var s = url.substring(i+1);
+ i = parseInt(s);
 $(function() {
   document.onkeydown = handleKey;
   function handleKey(evt) {
+
     evt = evt || window.event;
     switch (evt.keyCode) {
       case 37:
-      window.location = "/browse/{{prev}}";
+      i--;
+      window.location = "/browse/" + i;
       break;
 
       case 39:
-      window.location = "/browse/{{next}}";
+      i++
+      window.location = "/browse/" + i;
       break;
     }
   };

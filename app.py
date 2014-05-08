@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, send_from_directory, make_response, send_file
-from flask import Response, redirect, url_for
+from flask import Response, redirect, url_for, session
 from glob import glob
 from PIL import Image
 from config import *
@@ -54,19 +54,61 @@ def get_movies():
 @app.route("/browse/<value>")
 def browse(value=0):
     jpg_list = get_images()
+    row_len = DESKTOP_COLS
+    page_len = row_len * DESKTOP_ROWS
     value=int(value)
     buf = StringIO()
-    for i in xrange(value*20, (value+1)*20):
+    for i in xrange(value*page_len, (value+1)*page_len):
         if i >= len(jpg_list):
             break
-        if i % 4 == 0 and i > 0:
+        if i % row_len == 0 and i > 0:
             buf.write('</div>\n')
-        if i % 4 == 0:
+        if i % row_len == 0:
             buf.write('<div class="row">\n')
-        buf.write('<div class="image"><a href="/view/' + str(i) + '"><img src="/thumb/' + str(i) + '"></img></a></div>\n')
+        if jpg_list[i].endswith('gif'):
+            image_type = 'img-gif'
+        else:
+            image_type = 'img-jpg'
+        buf.write('<div class="image ' + image_type + '"><a href="/view/' + str(i) + '"><img src="/thumb/' + str(i) + '"></img></a></div>\n')
+    session['browsei'] = value
     buf.write('</div>\n')
     buf.seek(0)
     return render_template('browse.html', index=value, next=value+1, prev=max(0, value-1), title='Browse', html_content=buf.read())
+
+@app.route("/mobilebrowse")
+@app.route("/mobilebrowse/<value>")
+def mobilebrowse(value=0):
+    jpg_list = get_images()
+    value=int(value)
+    buf = StringIO()
+    if 'browsei' in session:
+        del session['browsei']
+    for i in xrange(value*30, (value+1)*30):
+        if i >= len(jpg_list):
+            break
+        if jpg_list[i].endswith('gif'):
+            image_type = 'img-gif'
+        else:
+            image_type = 'img-jpg'
+        buf.write('<div class="image ' + image_type + '"><a href="/view/' + str(i) + '"><img src="/thumb/' + str(i) + '"></img></a></div>\n')
+    session['browsem'] = value
+    buf.write('</div>\n')
+    buf.seek(0)
+    return render_template('mobilebrowse.html', index=value, next=value+1, prev=max(0, value-1), title='Browse', html_content=buf.read())
+
+@app.route("/pop")
+def pop():
+    if 'browsem' in session:
+        i = session['browsem']
+        del session['browsem']
+        return redirect(url_for('mobilebrowse', value=i))
+
+    elif 'browsei' in session:
+        i = session['browsei']
+        del session['browsei']
+        return redirect(url_for('browse', value=i))
+    
+    return redirect(url_for('browse'))
   
 @app.route("/browse/gifs")
 @app.route("/browse/gifs/<value>")
@@ -210,7 +252,7 @@ def serve_index(value):
     img_path = filecache[ivalue]
     prev = max(ivalue - 1,0)
 
-    return render_template('individual.html', title="View", index=value, prev=prev, next=ivalue+1,imgitem=img_path)
+    return render_template('individual.html', title="View", index=value, rows=DESKTOP_ROWS, cols=DESKTOP_COLS, imgitem=img_path)
 
 @app.route("/mobile/<value>")
 def serve_mobile(value):
@@ -226,19 +268,8 @@ def serve_mobile(value):
     return render_template('mobile.html', title="Mobile View", index=value, prev=prev, next=ivalue+1,imgitem=img_path)
 
 
-@app.route("/mobilebrowse")
-@app.route("/mobilebrowse/<value>")
-def mobilebrowse(value=0):
-    jpg_list = get_images()
-    value=int(value)
-    buf = StringIO()
-    for i in xrange(value*30, (value+1)*30):
-        if i >= len(jpg_list):
-            break
-        buf.write('<div class="image"><a href="/view/' + str(i) + '"><img src="/thumb/' + str(i) + '"></img></a></div>\n')
-    buf.write('</div>\n')
-    buf.seek(0)
-    return render_template('mobilebrowse.html', index=value, next=value+1, prev=max(0, value-1), title='Browse', html_content=buf.read())
+
+app.secret_key = 'supersecret'
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)

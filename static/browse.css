@@ -1,7 +1,13 @@
 .image {
-    float: left;
-    padding-left: 5px;
-    padding-top: 5px;
+  float: left;
+  padding-left: 5px;
+  padding-top: 5px;
 }
 
+.img-gif {
+  background: #aaa;
+}
 
+body {
+    background: #000000;
+}
